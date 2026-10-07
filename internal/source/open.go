@@ -15,5 +15,7 @@ func (a *Adapter) Open() error {
 	if a.busy {
 		return fmt.Errorf("open source: %w", ErrSourceBusy)
 	}
+	a.busy = true
 	return nil
 }
+func (a *Adapter) Close() { a.busy = false }

@@ -26,13 +26,19 @@ func (c *Controller) Start(ctx context.Context, power float64) error {
 		return err
 	}
 	if err := c.heater.Preheat(ctx); err != nil {
+		c.adapter.Close()
 		c.admission.Release(weight)
+		c.power = 0
 		return err
 	}
 	c.power = power
 	return nil
 }
-func (c *Controller) Stop()                          { c.admission.Release(int(c.power)); c.power = 0 }
+func (c *Controller) Stop() {
+	c.adapter.Close()
+	c.admission.Release(int(c.power))
+	c.power = 0
+}
 func (c *Controller) Power() float64                 { return c.power }
 func (c *Controller) AdmissionUsed() int             { return c.admission.Used() }
 func (c *Controller) ConfigureBusy(value bool)       { c.adapter.SetBusy(value) }
